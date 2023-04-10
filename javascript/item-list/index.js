@@ -45,14 +45,41 @@ const showTaskList = (taskList) => {
     list.innerHTML = ""
     taskList.forEach(item => {
         list.innerHTML += `
-        <li class="d-flex align-items-center list-group-item">
+        <li id="item-${item.order}" class="d-flex align-items-center list-group-item unmarked">
+            <input onclick="handleClick(${item.order})" class="form-check-input mb-3 p-1 me-4" type="checkbox">
             <h5 class="me-4">${item.order}</h5>
             <h5>${item.task}</h5>
             <p class="mt-3 ms-auto">${item.time}</p>
+            <button style="text-decoration: none;" onclick="handleDelete(${item.order})" class="ms-4 btn btn-danger">Delete</button>
         </li>
     `
     })
 }
+
+const  handleClick = (order) => {
+    document.querySelector(`#item-${order}`).classList.forEach((className) => {
+        if(className === "unmarked") {
+            document.querySelector(`#item-${order}`).classList.remove("unmarked")
+            document.querySelector(`#item-${order}`).classList.add("marked")
+            return
+        } else if(className === "marked") {
+            document.querySelector(`#item-${order}`).classList.remove("marked")
+            document.querySelector(`#item-${order}`).classList.add("unmarked")
+            return
+        }
+    })
+}
+
+const handleDelete = (order) => {
+    let newTaskList = taskList.filter((item) => {
+        if(item.order != order) {
+            return item
+        }
+    })
+    taskList = newTaskList
+    showTaskList(taskList)
+}
+
 
 saveBtn.addEventListener("click", () => {
     save()
@@ -63,7 +90,7 @@ const save = () => {
     localStorage.setItem("TaskList", JSON.stringify(taskList))
 }
 
-if(localStorageControl && localStorageTaskLists !== "") {
+if(localStorageControl && localStorageTaskLists !== null) {
     showMessage("Eski verileriniz başarı ile yüklendi", "success")
     taskList = localStorageTaskLists
     localStorageControl = false
